@@ -7,7 +7,6 @@ import Header from './components/Header';
 import ItemForm from './components/ItemForm';
 import Filters from './components/Filters';
 import ShoppingTable from './components/ShoppingTable';
-import ExportButton from './components/ExportButton';
 import ReportModal from './components/ReportModal';
 import TitleRow from './components/TitleRow';
 

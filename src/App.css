@@ -32,7 +32,7 @@
   --text-primary: #ffffff;
   --text-secondary: #cccccc;
   --bg-primary: #1f1f1f;
-  --bg-secondary: #2a2a2a;
+  --bg-secondary: #000000;
   --border-color: #434343;
 }
 
@@ -112,32 +112,35 @@
 }
 
 /* Report Modal Styling */
-.report-modal .ant-modal-content {
+/* .report-modal .ant-modal-content {
   border-radius: 12px;
-}
+} */
 
-.report-content .ant-card {
+/* .report-content .ant-card {
   border-radius: 8px;
   border: 1px solid var(--border-color);
-}
+} */
 
-.dark .report-content .ant-card {
+/* .dark .report-content .ant-card {
   background-color: var(--bg-secondary);
   border-color: var(--border-color);
-}
+} */
 
 /* Chart Container */
-.chart-container {
+/* .chart-container {
   background-color: var(--bg-primary);
   border-radius: 8px;
   padding: 16px;
   border: 1px solid var(--border-color);
-}
+} */
 
-.dark .chart-container {
+/* .dark .chart-container {
   background-color: var(--bg-secondary);
   border-color: var(--border-color);
-}
+} */
+/* .dark .shopping-list-modal .ant-modal .ant-modal-content{
+   background-color: var(--bg-secondary);
+ } */
 
 /* Responsive Design */
 @media (max-width: 768px) {
@@ -195,6 +198,16 @@
 ::-webkit-scrollbar-thumb:hover {
   background: var(--text-secondary);
 } */
+
+.dark .shopping-list-modal .ant-modal-content {
+  border: 1px solid black !important;  /* override thick grey border */
+  background-color: black !important; /* optional, to match your theme */
+  box-shadow: none !important;         /* optional, removes shadow */
+}
+
+.dark .shopping-list-modal .ant-modal-header {
+  background-color: black !important;
+}
 
 /* Print Styles */
 @media print {

@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
-import type{ ShoppingItem, FilterState, SortConfig, ThemeMode } from '../types';
+import type{ ShoppingItem, FilterState, SortConfig } from '../types';
 import { v4 as uuidv4 } from 'uuid';
 import dayjs from 'dayjs';
-import { generateMockData } from '../data/mockData';
+import { loadMockData } from '../data/dataLoader';
 
 interface ShoppingState {
   items: ShoppingItem[];
@@ -17,12 +17,11 @@ type ShoppingAction =
   | { type: 'ADD_ITEM'; payload: Omit<ShoppingItem, 'id' | 'total' | 'isNew'> }
   | { type: 'SET_FILTERS'; payload: Partial<FilterState> }
   | { type: 'SET_SORT'; payload: SortConfig }
-  | { type: 'TOGGLE_THEME' }
   | { type: 'SET_REPORT_MODAL'; payload: boolean }
   | { type: 'REMOVE_NEW_LABELS' };
 
 // Load mock data on initialization
-const mockItems = generateMockData();
+const mockItems = loadMockData();
 
 const initialState: ShoppingState = {
   items: mockItems,

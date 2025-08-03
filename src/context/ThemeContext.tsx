@@ -46,6 +46,10 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         fontFamily: 'Inter, Proxima Nova, sans-serif',
       },
       components: {
+        Modal:{
+          contentBg: isDark? '#000000' : "#ffffff",
+          headerBg: isDark? '#000000' : "#ffffff"
+        },
         Button: {
           colorPrimary: isDark ?"#3086FF" :"#1677FF",
           colorPrimaryHover: isDark ? '#69b1ff' : '#36cfc9',

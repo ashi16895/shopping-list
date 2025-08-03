@@ -65,7 +65,7 @@ const Filters: React.FC = () => {
 
   return (
     <div className='flex px-6 py-6 justify-between'>
-      <div><Title level={4}>13 Items</Title>
+      <div><Title level={4}>{state.filteredItems.length} Items</Title>
       </div>
     <div className="flex">
       <div className={`text-sm text-bold p-[6px] ${themeMode === "dark"? "text-white": "text-black"}`}>Filter By</div>

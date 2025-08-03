@@ -2,8 +2,14 @@ import React from 'react';
 import { Button } from 'antd';
 import { BarChartOutlined } from '@ant-design/icons';
 import Cart from '../assets/Cart.svg';
+import { useShoppingContext } from '../context/ShoppingContext';
 
 const TitleRow: React.FC = () => {
+  const { dispatch } = useShoppingContext();
+
+  const handleViewReport = () => {
+    dispatch({ type: 'SET_REPORT_MODAL', payload: true });
+  };
   return (
     <div className="flex justify-between px-[18px] py-[24px] items-center">
       <div className="flex items-center flex-wrap">
@@ -12,14 +18,15 @@ const TitleRow: React.FC = () => {
           Shopping List Application
         </div>
       </div>
-      <div>
-        <Button
-          className="font-semibold"
-          icon={<BarChartOutlined className="!font-semibold" />}
-        >
-          <span className="font-semibold">View Reports</span>
-        </Button>
-      </div>
+             <div>
+         <Button
+           className="font-semibold"
+           icon={<BarChartOutlined className="!font-semibold" />}
+           onClick={handleViewReport}
+         >
+           <span className="font-semibold">View Reports</span>
+         </Button>
+       </div>
     </div>
   );
 };

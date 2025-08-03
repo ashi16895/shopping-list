@@ -174,7 +174,11 @@ const ShoppingTable: React.FC = () => {
     <div className="text-left">
       ${item.total.toFixed(2)}
     </div>
-    <div className="text-left">{item.date}</div>
+    <div className="text-left">{new Date(item.date).toLocaleDateString('en-GB', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  })}</div>
   </div>
 );
 
