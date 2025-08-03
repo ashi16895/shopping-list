@@ -3,6 +3,7 @@ import React from 'react';
 
 import { ThemeProvider, useTheme } from './context/ThemeContext';
 import { ShoppingProvider } from './context/ShoppingContext';
+import { CurrencyProvider } from './context/CurrencyContext';
 import Header from './components/Header';
 import ItemForm from './components/ItemForm';
 import Filters from './components/Filters';
@@ -41,9 +42,11 @@ const AppContent: React.FC = () => {
 function App() {
   return (
     <ThemeProvider>
-    <ShoppingProvider>
-      <AppContent />
-    </ShoppingProvider>
+      <CurrencyProvider>
+        <ShoppingProvider>
+          <AppContent />
+        </ShoppingProvider>
+      </CurrencyProvider>
     </ThemeProvider>
   );
 }

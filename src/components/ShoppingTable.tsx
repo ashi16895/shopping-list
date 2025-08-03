@@ -4,10 +4,12 @@ import { ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons';
 import { useShoppingContext } from '../context/ShoppingContext';
 import type { ShoppingItem } from '../types';
 import { useTheme } from '../context/ThemeContext';
+import { useCurrency } from '../context/CurrencyContext';
 
 const ShoppingTable: React.FC = () => {
   const {Title} = Typography
   const {themeMode} = useTheme();
+  const { formatPrice } = useCurrency();
   const { state, dispatch } = useShoppingContext();
   const [visibleItems, setVisibleItems] = useState<ShoppingItem[]>([]);
   const [itemsPerPage] = useState(20);
@@ -169,10 +171,10 @@ const ShoppingTable: React.FC = () => {
       {item.quantity}
     </div>
     <div className="text-left">
-      ${item.price.toFixed(2)}
+      {formatPrice(item.price)}
     </div>
     <div className="text-left">
-      ${item.total.toFixed(2)}
+      {formatPrice(item.total)}
     </div>
     <div className="text-left">{new Date(item.date).toLocaleDateString('en-GB', {
     day: '2-digit',

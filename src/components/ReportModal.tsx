@@ -11,6 +11,7 @@ import {
   Legend,
 } from 'chart.js';
 import { useShoppingContext } from '../context/ShoppingContext';
+import { useCurrency } from '../context/CurrencyContext';
 import { useTheme } from '../context/ThemeContext';
 
 ChartJS.register(
@@ -24,6 +25,7 @@ ChartJS.register(
 
 const ReportModal: React.FC = () => {
   const {themeMode} = useTheme()
+  const { formatPrice, getCurrencySymbol } = useCurrency();
   const { state, dispatch, getReportData } = useShoppingContext();
 
   const reportData = useMemo(() => getReportData(), [getReportData]);
@@ -36,14 +38,14 @@ const ReportModal: React.FC = () => {
       labels: categories,
       datasets: [
         {
-          label: 'Total Spending ($)',
+          label: `Total Spending (${getCurrencySymbol()})`,
           data: totals,
           backgroundColor: themeMode === "dark" ? "#91CAFF" : "rgba(54, 162, 235, 0.6)",
           borderWidth: 1,
         },
       ],
     };
-  }, [reportData.categoryTotals]);
+  }, [reportData.categoryTotals, getCurrencySymbol]);
 
   const chartOptions = {
     responsive: true,
@@ -73,7 +75,7 @@ const ReportModal: React.FC = () => {
         },
         ticks: {
           callback: function (value: any) {
-            return '$' + value.toFixed(2);
+            return getCurrencySymbol() + value.toFixed(2);
           },
         },
       },
@@ -103,7 +105,7 @@ const ReportModal: React.FC = () => {
                 Total Spending
               </div>
               <div className="text-2xl font-bold text-blue-600">
-                ${reportData.totalSpending.toFixed(2)}
+                {formatPrice(reportData.totalSpending)}
               </div>
               <div className="text-xs text-gray-500 mt-1">
                 {reportData.totalItems} Items in total
@@ -117,7 +119,7 @@ const ReportModal: React.FC = () => {
                 Highest Cost Item
               </div>
               <div className="text-2xl font-bold text-blue-600">
-                ${reportData.highestCostItem?.total.toFixed(2) || '0.00'}
+                {reportData.highestCostItem ? formatPrice(reportData.highestCostItem.total) : formatPrice(0)}
               </div>
               <div className="text-xs text-gray-500 mt-1">
                 {reportData.highestCostItem?.name || 'No items'}
@@ -134,7 +136,7 @@ const ReportModal: React.FC = () => {
                 Average Cost
               </div>
               <div className="text-2xl font-bold text-blue-600">
-                ${reportData.averageCost.toFixed(2)}
+                {formatPrice(reportData.averageCost)}
               </div>
               <div className="text-xs text-gray-500 mt-1">
                 Per Item

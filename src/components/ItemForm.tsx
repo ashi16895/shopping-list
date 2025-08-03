@@ -5,9 +5,12 @@ import dayjs from 'dayjs';
 import { useShoppingContext } from '../context/ShoppingContext';
 import { getCategoryOptions, getSubCategoryOptions } from '../constants/categories';
 import { useTheme } from '../context/ThemeContext';
+import { useCurrency } from '../context/CurrencyContext';
+import PriceInput from './PriceInput';
 
 const ItemForm: React.FC = () => {
-const { themeMode } = useTheme();
+  const { themeMode } = useTheme();
+  const { currency } = useCurrency();
   const [form] = Form.useForm();
   const { addItem } = useShoppingContext();
   const [selectedCategory, setSelectedCategory] = useState<string>('');
@@ -32,12 +35,18 @@ const { themeMode } = useTheme();
   }
 
   const onFinish = (values: FormValues) => {
+    // Store price in USD as base currency for consistency
+    let priceInUSD = values.price;
+    if (currency === 'INR') {
+      priceInUSD = values.price / 83.12; // Convert INR to USD
+    }
+
     const newItem = {
       name: values.name,
       category: values.category,
       subCategory: values.subCategory,
       quantity: values.quantity,
-      price: values.price,
+      price: priceInUSD, // Store in USD
       date: values.date.format('YYYY-MM-DD'),
     };
 
@@ -52,11 +61,7 @@ const { themeMode } = useTheme();
     setSelectedCategory(value);
   };
 
-  const priceParser = (value: string | undefined) => {
-    if (!value) return 0;
-    const parsed = value.replace(/\$\s?|(,*)/g, '');
-    return parsed === '' ? 0 : Number(parsed);
-  };
+
 
   return (
     <div className="shopping-form-container px-[24px] py-[20px]">
@@ -129,13 +134,12 @@ const { themeMode } = useTheme();
               label="Price"
             //   rules={[{ message: 'Please enter price!' }]}
             >
-              <InputNumber
+              <PriceInput
                 placeholder="0"
                 min={0}
                 step={0.01}
-                formatter={value => `$ ${value}`}
-                parser={priceParser}
                 style={{ width: '100%' }}
+                showCurrencySelector={true}
               />
             </Form.Item>
           </Col>
