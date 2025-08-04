@@ -244,3 +244,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Tailwind CSS** for utility-first styling
 - **React Team** for the amazing framework
 - **Vite** for lightning-fast development experience
+
+## Live Demo
+
+Check out the live demo here: [Shopping List App](https://shopping-list-nine-lyart.vercel.app/)
+
