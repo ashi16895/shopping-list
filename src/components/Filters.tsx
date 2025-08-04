@@ -64,48 +64,47 @@ const Filters: React.FC = () => {
   ];
 
   return (
-    <div className='flex px-6 py-6 justify-between'>
-      <div><Title level={4}>{state.filteredItems.length} Items</Title>
+    <div className='flex px-6 py-6 justify-between items-start'>
+      <div className="flex-shrink-0">
+        <Title level={4}>{state.filteredItems.length} Items</Title>
       </div>
-    <div className="flex">
-      <div className={`text-sm text-bold p-[6px] ${themeMode === "dark"? "text-white": "text-black"}`}>Filter By</div>
-      <Row gutter={8}>
-        <Col xs={24} sm={12} md={6}>
-          
+      
+      <div className="flex items-center gap-3 flex-shrink-0">
+        <div className={`text-sm font-medium whitespace-nowrap ${themeMode === "dark"? "text-white": "text-black"}`}>
+          Filter By
+        </div>
+        
+        <div className="flex gap-2 items-center">
           <Select
             placeholder="Select Category"
             value={state.filters.selectedCategory}
             onChange={handleCategoryChange}
-            style={{ width: '100%' }}
+            style={{ width: 140, minWidth: 140 }}
             options={categoryOptions}
+            getPopupContainer={(triggerNode) => triggerNode.parentElement}
           />
-        </Col>
-        
-        <Col xs={24} sm={12} md={6}>
+          
           <Select
             placeholder="Select Sub Category"
             value={state.filters.selectedSubCategory}
             onChange={handleSubCategoryChange}
-            style={{ width: '100%' }}
+            style={{ width: 160, minWidth: 160 }}
             disabled={!state.filters.selectedCategory}
             options={subCategoryOptionsWithAll}
+            getPopupContainer={(triggerNode) => triggerNode.parentElement}
           />
-        </Col>
-        <Col xs={24} sm={24} md={7}>
+          
           <Search
             placeholder="Search"
             value={state.filters.searchTerm}
             onChange={e => handleSearchChange(e.target.value)}
-            style={{ width: '100%' }}
+            style={{ width: 200, minWidth: 200 }}
             prefix={<SearchOutlined />}
           />
-        </Col>
-        <Col xs={24} sm={24} md={3}>
-        <ExportButton />
-        </Col>
-      </Row>
-      
-    </div>
+          
+          <ExportButton />
+        </div>
+      </div>
     </div>
   );
 };
