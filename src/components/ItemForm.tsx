@@ -1,16 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import { Form, Input, InputNumber, Select, DatePicker, Button, Row, Col, message } from 'antd';
+import React, { useState, useEffect, useCallback, memo } from 'react';
+import { Form, Input, InputNumber, Select, DatePicker, Button, Row, Col } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { useShoppingContext } from '../context/ShoppingContext';
 import { getCategoryOptions, getSubCategoryOptions } from '../constants/categories';
 import { useTheme } from '../context/ThemeContext';
 import { useCurrency } from '../context/CurrencyContext';
+import { useErrorHandler } from '../hooks/useErrorHandler';
 import PriceInput from './PriceInput';
 
-const ItemForm: React.FC = () => {
+const ItemForm: React.FC = memo(() => {
   const { themeMode } = useTheme();
   const { currency } = useCurrency();
+  const { handleError } = useErrorHandler();
   const [form] = Form.useForm();
   const { addItem } = useShoppingContext();
   const [selectedCategory, setSelectedCategory] = useState<string>('');
@@ -34,34 +36,52 @@ const ItemForm: React.FC = () => {
     date: dayjs.Dayjs;
   }
 
-  const onFinish = (values: FormValues) => {
-    // Store price in USD as base currency for consistency
-    let priceInUSD = values.price;
-    if (currency === 'INR') {
-      priceInUSD = values.price / 83.12; // Convert INR to USD
+  const onFinish = useCallback((values: FormValues) => {
+    try {
+      // Store price in USD as base currency for consistency
+      let priceInUSD = values.price;
+      if (currency === 'INR') {
+        priceInUSD = values.price / 83.12; // Convert INR to USD
+      }
+
+      // Validate inputs
+      if (!values.name?.trim()) {
+        throw new Error('Item name is required');
+      }
+      
+      if (values.quantity <= 0) {
+        throw new Error('Quantity must be greater than 0');
+      }
+      
+      if (values.price <= 0) {
+        throw new Error('Price must be greater than 0');
+      }
+
+      const newItem = {
+        name: values.name.trim(),
+        category: values.category,
+        subCategory: values.subCategory,
+        quantity: values.quantity,
+        price: priceInUSD, // Store in USD
+        date: values.date.format('YYYY-MM-DD'),
+      };
+
+      addItem(newItem);
+      
+      // Reset form
+      form.resetFields();
+      form.setFieldsValue({ date: dayjs() });
+      setSelectedCategory('');
+    } catch (error) {
+      handleError(error);
     }
+  }, [addItem, currency, form, handleError]);
 
-    const newItem = {
-      name: values.name,
-      category: values.category,
-      subCategory: values.subCategory,
-      quantity: values.quantity,
-      price: priceInUSD, // Store in USD
-      date: values.date.format('YYYY-MM-DD'),
-    };
-
-    addItem(newItem);
-    form.resetFields();
-    form.setFieldsValue({ date: dayjs() });
-    setSelectedCategory('');
-    message.success('Item added successfully!');
-  };
-
-  const handleCategoryChange = (value: string) => {
+  const handleCategoryChange = useCallback((value: string) => {
     setSelectedCategory(value);
-  };
-
-
+    // Reset subcategory when category changes
+    form.setFieldsValue({ subCategory: undefined });
+  }, [form]);
 
   return (
     <div className="shopping-form-container px-[24px] py-[20px]">
@@ -80,7 +100,6 @@ const ItemForm: React.FC = () => {
             <Form.Item
               name="name"
               label="Add new Item"
-            //   rules={[{  message: 'Please enter item name!' }]}
             >
               <Input placeholder="Enter Item Name" />
             </Form.Item>
@@ -90,7 +109,6 @@ const ItemForm: React.FC = () => {
             <Form.Item
               name="category"
               label="Category"
-            //   rules={[{ message: 'Please select category!' }]}
             >
               <Select
                 placeholder="Select"
@@ -104,7 +122,6 @@ const ItemForm: React.FC = () => {
             <Form.Item
               name="subCategory"
               label="Sub Category"
-            //   rules={[{ message: 'Please select sub category!' }]}
             >
               <Select
                 placeholder="Select"
@@ -118,7 +135,6 @@ const ItemForm: React.FC = () => {
             <Form.Item
               name="quantity"
               label="Quantity"
-            //   rules={[{ message: 'Please enter quantity!' }]}
             >
               <InputNumber 
                 placeholder="0" 
@@ -132,7 +148,6 @@ const ItemForm: React.FC = () => {
             <Form.Item
               name="price"
               label="Price"
-            //   rules={[{ message: 'Please enter price!' }]}
             >
               <PriceInput
                 placeholder="0"
@@ -148,13 +163,11 @@ const ItemForm: React.FC = () => {
             <Form.Item
               name="date"
               label="Date"
-              //rules={[{ message: 'Please select date!' }]}
             >
               <DatePicker style={{ width: '100%' }} />
             </Form.Item>
-
-            
           </Col>
+          
           <Col xs={24} sm={24} md={3}>
             <Form.Item>
               <Button 
@@ -166,11 +179,12 @@ const ItemForm: React.FC = () => {
               </Button>
             </Form.Item>
           </Col>
-          
         </Row>
       </Form>
     </div>
   );
-};
+});
+
+ItemForm.displayName = 'ItemForm';
 
 export default ItemForm;

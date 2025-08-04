@@ -1,15 +1,15 @@
-import React from 'react';
+import React, { memo, useCallback } from 'react';
 import { Button } from 'antd';
 import { BarChartOutlined } from '@ant-design/icons';
 import Cart from '../assets/Cart.svg';
 import { useShoppingContext } from '../context/ShoppingContext';
 
-const TitleRow: React.FC = () => {
+const TitleRow: React.FC = memo(() => {
   const { dispatch } = useShoppingContext();
 
-  const handleViewReport = () => {
+  const handleViewReport = useCallback(() => {
     dispatch({ type: 'SET_REPORT_MODAL', payload: true });
-  };
+  }, [dispatch]);
   return (
     <div className="flex justify-between px-[18px] py-[24px] items-center">
       <div className="flex items-center flex-wrap">
@@ -29,6 +29,8 @@ const TitleRow: React.FC = () => {
        </div>
     </div>
   );
-};
+});
+
+TitleRow.displayName = 'TitleRow';
 
 export default TitleRow;

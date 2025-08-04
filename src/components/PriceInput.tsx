@@ -1,5 +1,5 @@
-import React from 'react';
-import { InputNumber, Select, Space } from 'antd';
+import React, { useCallback, memo } from 'react';
+import { InputNumber, Select } from 'antd';
 import { useCurrency } from '../context/CurrencyContext';
 import type { Currency } from '../context/CurrencyContext';
 
@@ -14,7 +14,7 @@ interface PriceInputProps {
   showCurrencySelector?: boolean;
 }
 
-const PriceInput: React.FC<PriceInputProps> = ({
+const PriceInput: React.FC<PriceInputProps> = memo(({
   value,
   onChange,
   placeholder = "0",
@@ -26,18 +26,18 @@ const PriceInput: React.FC<PriceInputProps> = ({
 }) => {
   const { currency, setCurrency, getCurrencySymbol, convertPrice } = useCurrency();
 
-  const handleCurrencyChange = (newCurrency: Currency) => {
+  const handleCurrencyChange = useCallback((newCurrency: Currency) => {
     setCurrency(newCurrency);
     // Convert current value to new currency if there's a value
     if (value && onChange) {
       const convertedValue = convertPrice(value, currency === 'USD' ? 'USD' : 'INR');
       onChange(convertedValue);
     }
-  };
+  }, [convertPrice, currency, onChange, setCurrency, value]);
 
   const currencyOptions = [
-    { label: '$ USD', value: 'USD' },
-    { label: '₹ INR', value: 'INR' },
+    { label: '$ USD', value: 'USD' as Currency },
+    { label: '₹ INR', value: 'INR' as Currency },
   ];
 
   const addonAfter = showCurrencySelector ? (
@@ -79,6 +79,8 @@ const PriceInput: React.FC<PriceInputProps> = ({
       precision={2}
     />
   );
-};
+});
+
+PriceInput.displayName = 'PriceInput';
 
 export default PriceInput;

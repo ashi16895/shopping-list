@@ -1,8 +1,11 @@
-import React, { createContext, useContext, useReducer, useEffect } from 'react';
-import type{ ShoppingItem, FilterState, SortConfig } from '../types';
+import React, { createContext, useContext, useReducer, useEffect, useCallback } from 'react';
+import type { ShoppingItem, FilterState, SortConfig } from '../types';
 import { v4 as uuidv4 } from 'uuid';
-import dayjs from 'dayjs';
+
 import { loadMockData } from '../data/dataLoader';
+import { exportShoppingItems } from '../utils/fileUtils';
+import { APP_CONFIG, SUCCESS_MESSAGES } from '../constants';
+import { message } from 'antd';
 
 interface ShoppingState {
   items: ShoppingItem[];
@@ -122,8 +125,10 @@ function applyFiltersAndSort(
       const bValue = b[sortConfig.key!];
       
       let comparison = 0;
-      if (aValue < bValue) comparison = -1;
-      else if (aValue > bValue) comparison = 1;
+      if (aValue !== undefined && bValue !== undefined) {
+        if (aValue < bValue) comparison = -1;
+        else if (aValue > bValue) comparison = 1;
+      }
       
       return sortConfig.direction === 'desc' ? comparison * -1 : comparison;
     });
@@ -135,62 +140,56 @@ function applyFiltersAndSort(
 export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [state, dispatch] = useReducer(shoppingReducer, initialState);
 
-  // Remove "New" labels after 5 seconds
+  // Remove "New" labels after configured timeout
   useEffect(() => {
     const hasNewItems = state.items.some(item => item.isNew);
     if (hasNewItems) {
       const timer = setTimeout(() => {
         dispatch({ type: 'REMOVE_NEW_LABELS' });
-      }, 5000);
+      }, APP_CONFIG.NEW_ITEM_TIMEOUT);
       return () => clearTimeout(timer);
     }
   }, [state.items]);
 
-  const addItem = (item: Omit<ShoppingItem, 'id' | 'total' | 'isNew'>) => {
+  const addItem = useCallback((item: Omit<ShoppingItem, 'id' | 'total' | 'isNew'>) => {
     dispatch({ type: 'ADD_ITEM', payload: item });
-  };
+    message.success(SUCCESS_MESSAGES.ITEM_ADDED);
+  }, []);
 
-  const exportData = (format: 'csv' | 'json') => {
-    const dataToExport = state.filteredItems.map(({ isNew, ...item }) => item);
-    
-    if (format === 'json') {
-      const jsonString = JSON.stringify(dataToExport, null, 2);
-      const blob = new Blob([jsonString], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `shopping-list-${dayjs().format('YYYY-MM-DD')}.json`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    } else if (format === 'csv') {
-      const headers = ['ID', 'Name', 'Category', 'Sub Category', 'Quantity', 'Price', 'Total', 'Date'];
-      const csvContent = [
-        headers.join(','),
-        ...dataToExport.map(item => 
-          [item.id, item.name, item.category, item.subCategory, item.quantity, item.price, item.total, item.date].join(',')
-        )
-      ].join('\n');
+  const exportData = useCallback((format: 'csv' | 'json') => {
+    try {
+      const dataToExport = state.filteredItems;
       
-      const blob = new Blob([csvContent], { type: 'text/csv' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `shopping-list-${dayjs().format('YYYY-MM-DD')}.csv`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    }
-  };
+      if (dataToExport.length === 0) {
+        message.warning('No data to export.');
+        return;
+      }
 
-  const getReportData = () => {
+      exportShoppingItems(dataToExport, format);
+      message.success(SUCCESS_MESSAGES.DATA_EXPORTED);
+    } catch (error) {
+      console.error('Export failed:', error);
+      message.error('Failed to export data. Please try again.');
+    }
+  }, [state.filteredItems]);
+
+  const getReportData = useCallback(() => {
     const items = state.filteredItems;
+    
+    if (items.length === 0) {
+      return {
+        totalSpending: 0,
+        highestCostItem: null,
+        averageCost: 0,
+        totalItems: 0,
+        categoryTotals: {},
+      };
+    }
+
     const totalSpending = items.reduce((sum, item) => sum + item.total, 0);
     const highestCostItem = items.reduce((max, item) => 
       item.total > (max?.total || 0) ? item : max, null as ShoppingItem | null);
-    const averageCost = items.length > 0 ? totalSpending / items.length : 0;
+    const averageCost = totalSpending / items.length;
     
     const categoryTotals = items.reduce((acc, item) => {
       acc[item.category] = (acc[item.category] || 0) + item.total;
@@ -204,7 +203,7 @@ export const ShoppingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       totalItems: items.length,
       categoryTotals,
     };
-  };
+  }, [state.filteredItems]);
 
   return (
     <ShoppingContext.Provider value={{ state, dispatch, addItem, exportData, getReportData }}>

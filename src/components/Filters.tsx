@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Input, Select, Row, Col, Typography} from 'antd';
+import { Input, Select, Typography} from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import { useShoppingContext } from '../context/ShoppingContext';
 import { getCategoryOptions, getSubCategoryOptions } from '../constants/categories';

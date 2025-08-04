@@ -1,4 +1,6 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useCallback, useMemo } from 'react';
+import type { ReactNode } from 'react';
+import { EXCHANGE_RATES } from '../constants';
 
 export type Currency = 'USD' | 'INR';
 
@@ -13,12 +15,6 @@ export interface CurrencyContextType {
 
 const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined);
 
-// Exchange rates (USD as base currency)
-const EXCHANGE_RATES = {
-  USD: 1,
-  INR: 83.12, // 1 USD = 83.12 INR (example rate)
-};
-
 interface CurrencyProviderProps {
   children: ReactNode;
 }
@@ -26,35 +22,35 @@ interface CurrencyProviderProps {
 export const CurrencyProvider: React.FC<CurrencyProviderProps> = ({ children }) => {
   const [currency, setCurrency] = useState<Currency>('USD');
 
-  const getExchangeRate = (from: Currency, to: Currency): number => {
+  const getExchangeRate = useCallback((from: Currency, to: Currency): number => {
     if (from === to) return 1;
     return EXCHANGE_RATES[to] / EXCHANGE_RATES[from];
-  };
+  }, []);
 
-  const convertPrice = (price: number, fromCurrency: Currency = 'USD'): number => {
+  const convertPrice = useCallback((price: number, fromCurrency: Currency = 'USD'): number => {
     if (fromCurrency === currency) return price;
     const rate = getExchangeRate(fromCurrency, currency);
-    return price * rate;
-  };
+    return Math.round(price * rate * 100) / 100; // Round to 2 decimal places
+  }, [currency, getExchangeRate]);
 
-  const getCurrencySymbol = (curr: Currency = currency): string => {
+  const getCurrencySymbol = useCallback((curr: Currency = currency): string => {
     return curr === 'USD' ? '$' : '₹';
-  };
+  }, [currency]);
 
-  const formatPrice = (price: number, fromCurrency: Currency = 'USD'): string => {
+  const formatPrice = useCallback((price: number, fromCurrency: Currency = 'USD'): string => {
     const convertedPrice = convertPrice(price, fromCurrency);
     const symbol = getCurrencySymbol();
     return `${symbol}${convertedPrice.toFixed(2)}`;
-  };
+  }, [convertPrice, getCurrencySymbol]);
 
-  const value: CurrencyContextType = {
+  const value: CurrencyContextType = useMemo(() => ({
     currency,
     setCurrency,
     convertPrice,
     formatPrice,
     getCurrencySymbol,
     getExchangeRate,
-  };
+  }), [currency, convertPrice, formatPrice, getCurrencySymbol, getExchangeRate]);
 
   return (
     <CurrencyContext.Provider value={value}>

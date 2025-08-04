@@ -1,21 +1,23 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, memo } from 'react';
 import { Badge, Typography } from 'antd';
 import { ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons';
 import { useShoppingContext } from '../context/ShoppingContext';
 import type { ShoppingItem } from '../types';
 import { useTheme } from '../context/ThemeContext';
 import { useCurrency } from '../context/CurrencyContext';
+import { APP_CONFIG } from '../constants';
 
-const ShoppingTable: React.FC = () => {
+
+const ShoppingTable: React.FC = memo(() => {
   const {Title} = Typography
   const {themeMode} = useTheme();
   const { formatPrice } = useCurrency();
   const { state, dispatch } = useShoppingContext();
   const [visibleItems, setVisibleItems] = useState<ShoppingItem[]>([]);
-  const [itemsPerPage] = useState(20);
+  const [itemsPerPage] = useState(APP_CONFIG.ITEMS_PER_PAGE);
+
   const [currentPage, setCurrentPage] = useState(1);
   const tableContainerRef = useRef<HTMLDivElement>(null);
-  const loadingRef = useRef<HTMLDivElement>(null);
 
   const handleSort = (key: keyof ShoppingItem) => {
     const direction = 
@@ -65,19 +67,14 @@ const ShoppingTable: React.FC = () => {
     loadMoreItems();
   }, [loadMoreItems]);
 
-  // useEffect(() => {
-  //   // Reset when filters change
-  //   setCurrentPage(1);
-  //   setVisibleItems(state.filteredItems.slice(0, itemsPerPage));
-  // }, [state.filteredItems, itemsPerPage]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(handleObserver, {
       threshold: 0.1,
     });
     
-    if (loadingRef.current) {
-      observer.observe(loadingRef.current);
+    if (tableContainerRef.current) {
+      observer.observe(tableContainerRef.current);
     }
     
     return () => observer.disconnect();
@@ -149,7 +146,7 @@ const ShoppingTable: React.FC = () => {
 
 
 
-  const TableRow = ({ item, index }: { item: ShoppingItem; index: number }) => (
+  const TableRow = ({ item }: { item: ShoppingItem; index: number }) => (
   <div
     key={item.id}
     className={`grid grid-cols-[2fr_repeat(6,_1fr)] gap-2 p-4 border-b border-gray text-sm ${
@@ -187,7 +184,6 @@ const ShoppingTable: React.FC = () => {
 
   return (
     <div className="shopping-table-container">
-      
       <div 
         ref={tableContainerRef}
         className="overflow-hidden"
@@ -195,17 +191,17 @@ const ShoppingTable: React.FC = () => {
         <TableHeader />
         
         <div className="max-h-96 overflow-y-auto">
-            <>
-              {visibleItems.map((item, index) => (
-                <TableRow key={item.id} item={item} index={index} />
-              ))}
-              
-              
+          <>
+            {visibleItems.map((item, index) => (
+              <TableRow key={item.id} item={item} index={index} />
+            ))}
           </>
         </div>
       </div>
     </div>
   );
-};
+});
+
+ShoppingTable.displayName = 'ShoppingTable';
 
 export default ShoppingTable;
