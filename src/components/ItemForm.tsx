@@ -96,7 +96,7 @@ const ItemForm: React.FC = memo(() => {
         }}
       >
         <Row gutter={12}>
-          <Col xs={24} sm={12} md={6}>
+          <Col span={6}>
             <Form.Item
               name="name"
               label="Add new Item"
@@ -105,7 +105,7 @@ const ItemForm: React.FC = memo(() => {
             </Form.Item>
           </Col>
           
-          <Col xs={24} sm={12} md={3}>
+          <Col span={3}>
             <Form.Item
               name="category"
               label="Category"
@@ -118,7 +118,7 @@ const ItemForm: React.FC = memo(() => {
             </Form.Item>
           </Col>
           
-          <Col xs={24} sm={12} md={3}>
+          <Col span={3}>
             <Form.Item
               name="subCategory"
               label="Sub Category"
@@ -131,7 +131,7 @@ const ItemForm: React.FC = memo(() => {
             </Form.Item>
           </Col>
           
-          <Col xs={24} sm={12} md={3}>
+          <Col span={3}>
             <Form.Item
               name="quantity"
               label="Quantity"
@@ -144,7 +144,7 @@ const ItemForm: React.FC = memo(() => {
             </Form.Item>
           </Col>
           
-          <Col xs={24} sm={12} md={3}>
+          <Col span={3}>
             <Form.Item
               name="price"
               label="Price"
@@ -159,7 +159,7 @@ const ItemForm: React.FC = memo(() => {
             </Form.Item>
           </Col>
           
-          <Col xs={24} sm={12} md={3}>
+          <Col span={3}>
             <Form.Item
               name="date"
               label="Date"
@@ -168,12 +168,12 @@ const ItemForm: React.FC = memo(() => {
             </Form.Item>
           </Col>
           
-          <Col xs={24} sm={24} md={3}>
+          <Col span={3}>
             <Form.Item>
               <Button 
                 htmlType="submit" 
                 icon={<PlusOutlined />}
-                className={`w-full md:w-auto mt-[30px]  ${themeMode === "dark" ? "bg-[#3086FF] text-black" : 'bg-[#1677FF] text-white'}`}
+                className={`w-full mt-[30px] ${themeMode === "dark" ? "bg-[#3086FF] text-black" : 'bg-[#1677FF] text-white'}`}
               >
                 Add Item
               </Button>

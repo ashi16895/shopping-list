@@ -99,7 +99,7 @@ const ReportModal: React.FC = () => {
       <div className={`${themeMode === 'dark'? "bg-black border border-black": "bg-white"}`}>
         {/* Summary Cards */}
         <Row gutter={16} className="mb-6">
-          <Col xs={24} sm={8}>
+          <Col span={8}>
             <Card className="text-center h-full">
               <div className={`text-sm mb-2 ${themeMode === 'dark'? "text-white": "text-black"}`}>
                 Total Spending
@@ -113,7 +113,7 @@ const ReportModal: React.FC = () => {
             </Card>
           </Col>
 
-          <Col xs={24} sm={8}>
+          <Col span={8}>
             <Card className="text-center h-full">
               <div className={`text-sm mb-2 ${themeMode === 'dark'? "text-white": "text-black"}`}>
                 Highest Cost Item
@@ -130,7 +130,7 @@ const ReportModal: React.FC = () => {
             </Card>
           </Col>
 
-          <Col xs={24} sm={8}>
+          <Col span={8}>
             <Card className="text-center h-full">
               <div className={`text-sm mb-2 ${themeMode === 'dark'? "text-white": "text-black"}`}>
                 Average Cost
